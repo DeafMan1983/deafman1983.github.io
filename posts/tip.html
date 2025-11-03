@@ -11,78 +11,84 @@
       <div class="form-text">Amount in USD</div>
     </div>
     
-    <button class="btn btn-primary w-100" onclick="goTip()">
-      <i class="bi bi-heart-fill"></i> Support via FaucetPay
+    <button class="btn btn-primary w-100 mb-2" onclick="testPayment()">
+      🔧 Test Payment Link
+    </button>
+    
+    <button class="btn btn-success w-100" onclick="goTip()">
+      💝 Support via FaucetPay
     </button>
     
     <div class="mt-3 p-3 bg-dark rounded">
       <small class="text-muted">
-        <strong>My FaucetPay Address:</strong><br>
-        <code id="faucetpayAddress">jenspeterewckervogt@gmail.com</code>
+        <strong>Payment Debug Info:</strong><br>
+        <div id="debugInfo" class="mt-2"></div>
       </small>
     </div>
   </div>
 </div>
 
-<!-- Alternative direct payment methods -->
-<div class="card">
-  <div class="card-body">
-    <h6>Other Support Methods:</h6>
-    <div class="d-grid gap-2">
-      <button class="btn btn-outline-secondary" onclick="copyAddress()">
-        Copy FaucetPay Address
-      </button>
-      <a href="https://faucetpay.io/?r=YOUR_REFERRAL_ID" class="btn btn-outline-info" target="_blank">
-        Sign up for FaucetPay
-      </a>
-    </div>
-  </div>
-</div>
-
 <script>
-// Replace with your actual FaucetPay address
-const FAUCETPAY_ADDRESS = "jenspeterewckervogt@gmail.com";
+// Replace with your ACTUAL FaucetPay address
+const FAUCETPAY_ADDRESS = "jenspetereckervogt@gmail.com";
 
-function trackTip(amount) {
-  // You can use Google Analytics, custom backend, or just console log
-  console.log(`Tip received: $${amount}`);
+function testPayment() {
+  const amount = document.getElementById('tipAmount').value;
+  const debugInfo = document.getElementById('debugInfo');
   
-  // Example: Send to Google Analytics
-  if (typeof gtag !== 'undefined') {
-    gtag('event', 'tip', {
-      'event_category': 'support',
-      'event_label': 'faucetpay',
-      'value': amount
-    });
+  // Validate amount
+  if (amount < 5 || amount > 50) {
+    debugInfo.innerHTML = `<span class="text-danger">❌ Invalid amount: $${amount}. Must be between $5-$50</span>`;
+    return;
   }
+  
+  // Construct URL
+  const url = `https://faucetpay.io/merchant/send?to=${FAUCETPAY_ADDRESS}&currency=USD&amount=${amount}`;
+  
+  // Show debug information
+  debugInfo.innerHTML = `
+    <div class="text-info">
+      <strong>Generated Payment URL:</strong><br>
+      <small><code>${url}</code></small>
+    </div>
+    <div class="mt-2">
+      <button class="btn btn-sm btn-outline-warning" onclick="window.open('${url}', '_blank')">
+        🔗 Test Open This URL
+      </button>
+    </div>
+  `;
+  
+  console.log("Payment URL:", url);
 }
 
-// Update the goTip function to include tracking
 function goTip() {
   const amount = document.getElementById('tipAmount').value;
   
+  // Validate amount
   if (amount < 5 || amount > 50) {
     alert('Please enter an amount between $5 and $50');
     return;
   }
   
-  // Track the tip attempt
-  trackTip(amount);
-  
   const url = `https://faucetpay.io/merchant/send?to=${FAUCETPAY_ADDRESS}&currency=USD&amount=${amount}`;
+  console.log("Redirecting to:", url);
+  
+  // Open in new tab
   window.open(url, '_blank');
 }
 
-function copyAddress() {
-  navigator.clipboard.writeText(FAUCETPAY_ADDRESS)
-    .then(() => {
-      alert('FaucetPay address copied to clipboard!');
-    })
-    .catch(err => {
-      console.error('Failed to copy: ', err);
-    });
+// Test if address is valid
+function validateFaucetPayAddress() {
+  if (!FAUCETPAY_ADDRESS || !FAUCETPAY_ADDRESS.includes('@faucetpay.io')) {
+    console.error("❌ Invalid FaucetPay address format");
+    return false;
+  }
+  console.log("✅ FaucetPay address format looks valid");
+  return true;
 }
 
-// Update the displayed address
-document.getElementById('faucetpayAddress').textContent = FAUCETPAY_ADDRESS;
+// Run validation on page load
+document.addEventListener('DOMContentLoaded', function() {
+  validateFaucetPayAddress();
+});
 </script>
