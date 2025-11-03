@@ -1,155 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de" data-bs-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mein Dark Blog</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mein Blog</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      background-color: #121212; /* tiefer dunkler Hintergrund */
-      color: #e0e0e0;            /* helles Grau für Text */
+      background-color: #121212;
+      color: #e0e0e0;
     }
     .card {
-      background-color: #1e1e1e; /* dunkle Cards */
-      color: #f1f1f1;
-      border: 1px solid #2b2b2b;
+      background-color: #1e1e1e;
+      border: 1px solid #333;
     }
-    .card-title {
-      color: #ffffff;
-    }
-    #postList a {
-      display: block;
-      padding: 6px 8px;
+    a {
       color: #66b2ff;
     }
-    #postList a:hover {
-      background-color: #2a2a2a;
-      text-decoration: none;
-      color: #ffffff;
+    a:hover {
+      color: #99ccff;
     }
-    article h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      color: #ffffff;
-    }
-    #postMeta {
-      font-size: 0.9rem;
-      color: #b0b0b0;
-    }
-    .navbar {
-      background-color: #212529 !important;
+    nav.navbar {
+      background-color: #0d0d0d !important;
     }
   </style>
 </head>
-
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#">Mein Blog</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div id="navbarContent" class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="#">Start</a></li>
-      </ul>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">Mein Blog</a>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<main class="container my-4">
-  <div id="alertPlaceholder"></div>
-  <div class="row">
-    <!-- Sidebar -->
-    <aside class="col-lg-4 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title mb-3">Beiträge</h5>
-          <ul id="postList" class="list-group list-group-flush"></ul>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">Beiträge</div>
+          <div class="list-group list-group-flush" id="postList"></div>
         </div>
       </div>
-    </aside>
-
-    <!-- Hauptinhalt -->
-    <section class="col-lg-8">
-      <article id="content" class="card shadow-sm p-4">
-        <h1 id="postTitle">Willkommen</h1>
-        <div id="postMeta" class="text-muted mb-3"></div>
-        <div id="postBody">
-          <p>Wähle einen Beitrag aus der Liste links aus, um ihn zu lesen.</p>
-        </div>
-      </article>
-    </section>
+      <div class="col-md-8">
+        <div id="postContent"></div>
+      </div>
+    </div>
   </div>
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // Beispiel-Posts (Markdown)
+    const posts = {
+      "hello-world": {
+        title: "Hello World",
+        date: "2025-11-03",
+        content: `
+# Hello World
 
-<script>
-// Simple client-side Markdown Blog (Dark Mode)
-const POSTS_JSON = '/posts.json';
+Willkommen zu meinem Blog. Hier schreibe ich Tutorials mit **Markdown** und style sie mit **Bootstrap 5**.
 
-async function loadJSON(url){
-  const res = await fetch(url);
-  if(!res.ok) throw new Error('Fehler beim Laden: ' + url);
-  return res.json();
-}
+## Warum so?
+- Einfach zu schreiben
+- Kein Build nötig (Client-Side SPA)
+- Du kannst Codeblöcke, Tabellen, Bilder etc. benutzen
+`
+      },
+      "tutorial-1": {
+        title: "Tutorial 1: Erste Schritte",
+        date: "2025-11-03",
+        content: `
+# Erste Schritte
 
-function showAlert(text, type='info'){
-  const el = document.getElementById('alertPlaceholder');
-  el.innerHTML = `<div class="alert alert-${type} mt-3">${text}</div>`;
-  setTimeout(()=> el.innerHTML = '', 4000);
-}
+Dies ist dein erstes Tutorial.
 
-function renderList(posts){
-  const ul = document.getElementById('postList');
-  ul.innerHTML = '';
-  posts.forEach(p=>{
-    const li = document.createElement('li');
-    li.className = 'list-group-item bg-transparent border-0';
-    li.innerHTML = `<a href="#/post/${p.slug}" class="text-decoration-none d-block">${p.title}</a>`;
-    ul.appendChild(li);
-  });
-}
+1. Lege neue Dateien an im Verzeichnis \`/posts\`
+2. Füge Markdown-Inhalte hinzu
+3. Verlinke sie in der Navigation
+`
+      }
+    };
 
-async function renderPost(posts, slug){
-  const post = posts.find(p=>p.slug===slug) || posts[0];
-  if(!post){
-    showAlert('Kein Beitrag gefunden', 'danger');
-    return;
-  }
-  document.getElementById('postTitle').textContent = post.title;
-  document.getElementById('postMeta').textContent = `Veröffentlicht: ${post.date || 'unbekannt'}`;
-  try {
-    const md = await (await fetch('/posts/' + post.file)).text();
-    document.getElementById('postBody').innerHTML = marked.parse(md);
-  } catch(err) {
-    showAlert('Fehler beim Laden des Beitrags: ' + err.message, 'danger');
-    document.getElementById('postBody').innerHTML = '';
-  }
-}
+    // Blog-Navigation generieren
+    const postList = document.getElementById("postList");
+    for (const [slug, post] of Object.entries(posts)) {
+      const link = document.createElement("a");
+      link.href = "#post/" + slug;
+      link.className = "list-group-item list-group-item-action bg-dark text-light";
+      link.textContent = post.title;
+      postList.appendChild(link);
+    }
 
-async function boot(){
-  try {
-    const posts = await loadJSON(POSTS_JSON);
-    renderList(posts);
-    const hash = location.hash;
-    const match = hash.match(/^#\/post\/(.+)/);
-    const slug = match ? match[1] : (posts[0] ? posts[0].slug : null);
-    await renderPost(posts, slug);
-    window.addEventListener('hashchange', async ()=>{
-      const h = location.hash.match(/^#\/post\/(.+)/);
-      await renderPost(posts, h ? h[1] : posts[0].slug);
-    });
-  } catch(e) {
-    showAlert(e.message, 'danger');
-  }
-}
+    // Routing (Client-Seite)
+    function loadPost() {
+      const hash = location.hash.replace("#post/", "");
+      const post = posts[hash] || posts["hello-world"];
+      document.getElementById("postContent").innerHTML = `
+        <div class="card mb-4">
+          <div class="card-body">
+            <h2>${post.title}</h2>
+            <small class="text-muted">Veröffentlicht: ${post.date}</small>
+            <hr>
+            <div>${marked.parse(post.content)}</div>
+          </div>
+        </div>`;
+    }
 
-boot();
-</script>
+    window.addEventListener("hashchange", loadPost);
+    loadPost();
+  </script>
 </body>
 </html>
