@@ -7,4 +7,4 @@ sudo chown -R $USER:$USER /opt/Gtk4Latest
 ```
 And you can open file manager like nautilus and test for creating directory without root access because it is very important for meson and ninja from pip3 that is why you need to resolve as normal user access.
 
-Continue to Build Instroduction
+Continue to [Build Introduction](#post/build-introduction)
