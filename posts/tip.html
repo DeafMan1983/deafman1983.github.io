@@ -1,64 +1,190 @@
 <div class="card mb-4">
-  <div class="card-body text-center">
-    <h5>💝 Support DeafMan1983</h5>
-    <p>Support my GTK4 Linux development tutorials</p>
+  <div class="card-header">
+    <h5 class="mb-0">💝 Support DeafMan1983</h5>
+  </div>
+  <div class="card-body">
+    <p>Support my GTK4 Linux development tutorials via FaucetPay</p>
     
-    <!-- Simple amount selection -->
-    <div class="mb-4">
-      <label class="form-label">Select Tip Amount:</label>
-      <div class="row g-2">
-        <div class="col-6">
-          <button class="btn btn-outline-primary w-100" onclick="preparePayment(1)">$1</button>
-        </div>
-        <div class="col-6">
-          <button class="btn btn-outline-primary w-100" onclick="preparePayment(5)">$5</button>
-        </div>
-        <div class="col-6">
-          <button class="btn btn-outline-primary w-100" onclick="preparePayment(10)">$10</button>
-        </div>
-        <div class="col-6">
-          <button class="btn btn-outline-primary w-100" onclick="preparePayment(20)">$20</button>
-        </div>
+    <!-- Payment Form -->
+    <div class="mb-3">
+      <label for="paymentAmount" class="form-label">Amount (USD):</label>
+      <input type="number" id="paymentAmount" min="1" max="50" value="5" class="form-control" step="0.01">
+    </div>
+    
+    <div class="mb-3">
+      <label for="userAddress" class="form-label">Your FaucetPay Address/Email:</label>
+      <input type="text" id="userAddress" class="form-control" placeholder="yourusername@faucetpay.io">
+    </div>
+    
+    <div class="mb-3">
+      <label for="currency" class="form-label">Currency:</label>
+      <select id="currency" class="form-select">
+        <option value="BTC">Bitcoin (BTC)</option>
+        <option value="LTC">Litecoin (LTC)</option>
+        <option value="ETH">Ethereum (ETH)</option>
+        <option value="DOGE">Dogecoin (DOGE)</option>
+        <option value="USD">USD</option>
+      </select>
+    </div>
+    
+    <button class="btn btn-success w-100" onclick="createPayment()">
+      💰 Create Payment
+    </button>
+    
+    <!-- Payment Result -->
+    <div id="paymentResult" class="mt-3" style="display: none;"></div>
+    
+    <!-- Quick Amount Buttons -->
+    <div class="mt-3">
+      <label class="form-label">Quick Amounts:</label>
+      <div class="btn-group w-100 flex-wrap">
+        <button class="btn btn-outline-primary btn-sm mb-1" onclick="setAmount(1)">$1</button>
+        <button class="btn btn-outline-primary btn-sm mb-1" onclick="setAmount(5)">$5</button>
+        <button class="btn btn-outline-primary btn-sm mb-1" onclick="setAmount(10)">$10</button>
+        <button class="btn btn-outline-primary btn-sm mb-1" onclick="setAmount(20)">$20</button>
+        <button class="btn btn-outline-primary btn-sm mb-1" onclick="setAmount(50)">$50</button>
       </div>
     </div>
-    
-    <!-- Payment information -->
-    <div class="alert alert-dark">
-      <h6>Send Payment via FaucetPay:</h6>
-      <p class="mb-1"><strong>Username:</strong> <code>deafman1983</code></p>
-      <p class="mb-1"><strong>Amount:</strong> <span id="selectedAmount">$10</span></p>
-      <button class="btn btn-success w-100 mt-2" onclick="goToFaucetPay()">
-        🚀 Go to FaucetPay to Complete Payment
-      </button>
-    </div>
-    
-    <p class="small text-muted">
-      You'll need a FaucetPay account with balance to send tips.
-    </p>
   </div>
 </div>
 
 <script>
-let currentAmount = 10;
+// Your FaucetPay API Key (from https://faucetpay.io/page/faucet-admin/manage?faucet=179278)
+const API_KEY = 'bc454d3eca54247c23aa0fa96fd505a76e50c364999a9697c34e3fda7d7bb1cb'; // Replace with your actual API key
 
-function preparePayment(amount) {
-  currentAmount = amount;
-  document.getElementById('selectedAmount').textContent = '$' + amount;
-  
-  // Show confirmation
-  alert(`Ready to send $${amount} to deafman1983\n\nClick the "Go to FaucetPay" button to complete payment.`);
+// FaucetPay API endpoints
+const FAUCETPAY_API = {
+  send: 'https://faucetpay.io/api/v1/send',
+  balance: 'https://faucetpay.io/api/v1/balance',
+  checkAddress: 'https://faucetpay.io/api/v1/checkaddress'
+};
+
+function setAmount(amount) {
+  document.getElementById('paymentAmount').value = amount;
 }
 
-function goToFaucetPay() {
-  // Redirect to FaucetPay send money page
-  window.open('https://faucetpay.io/page/send-money', '_blank');
+async function createPayment() {
+  const amount = document.getElementById('paymentAmount').value;
+  const userAddress = document.getElementById('userAddress').value;
+  const currency = document.getElementById('currency').value;
   
-  // Show final instructions
-  setTimeout(() => {
-    alert(`Payment Instructions:\n\n1. Login to FaucetPay\n2. Go to "Send Money"\n3. Recipient: deafman1983\n4. Amount: $${currentAmount}\n5. Complete payment`);
-  }, 1000);
+  if (!amount || amount < 1) {
+    alert('Please enter a valid amount (minimum $1)');
+    return;
+  }
+  
+  if (!userAddress) {
+    alert('Please enter your FaucetPay address or email');
+    return;
+  }
+  
+  // Show loading
+  const resultDiv = document.getElementById('paymentResult');
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<div class="alert alert-info">Processing payment...</div>';
+  
+  try {
+    // Create payment using FaucetPay API
+    const response = await sendPayment(amount, currency, userAddress);
+    
+    if (response.success) {
+      resultDiv.innerHTML = `
+        <div class="alert alert-success">
+          <h6>✅ Payment Created Successfully!</h6>
+          <p><strong>Amount:</strong> ${amount} ${currency}</p>
+          <p><strong>To:</strong> deafman1983</p>
+          <p><strong>From:</strong> ${userAddress}</p>
+          <p><strong>Payment ID:</strong> ${response.payment_id || 'N/A'}</p>
+          <p class="mb-0">Thank you for your support! ❤️</p>
+        </div>
+      `;
+    } else {
+      resultDiv.innerHTML = `
+        <div class="alert alert-danger">
+          <h6>❌ Payment Failed</h6>
+          <p><strong>Error:</strong> ${response.message}</p>
+          <p class="mb-0">Please try again or contact support.</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    resultDiv.innerHTML = `
+      <div class="alert alert-danger">
+        <h6>❌ API Error</h6>
+        <p><strong>Error:</strong> ${error.message}</p>
+        <p class="mb-0">Please check your connection and try again.</p>
+      </div>
+    `;
+  }
 }
 
-// Set default amount
-preparePayment(10);
+async function sendPayment(amount, currency, toAddress) {
+  // Since we can't make direct API calls from frontend due to CORS,
+  // we need to use a proxy or backend. Here's the structure:
+  
+  const payload = {
+    api_key: API_KEY,
+    amount: amount,
+    currency: currency,
+    to: toAddress,
+    // Optional: your recipient address (your FaucetPay account)
+    // from: 'deafman1983@faucetpay.io' 
+  };
+  
+  try {
+    // Method 1: Direct API call (may have CORS issues)
+    const response = await fetch(FAUCETPAY_API.send, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams(payload)
+    });
+    
+    return await response.json();
+  } catch (error) {
+    // Fallback: Show manual instructions
+    showManualPaymentInstructions(amount, currency, toAddress);
+    throw error;
+  }
+}
+
+function showManualPaymentInstructions(amount, currency, userAddress) {
+  const resultDiv = document.getElementById('paymentResult');
+  resultDiv.innerHTML = `
+    <div class="alert alert-warning">
+      <h6>🔧 Manual Payment Required</h6>
+      <p>Due to API restrictions, please complete the payment manually:</p>
+      <ol>
+        <li>Login to <a href="https://faucetpay.io" target="_blank">FaucetPay.io</a></li>
+        <li>Go to "Send Money" page</li>
+        <li>Send <strong>${amount} ${currency}</strong> to: <code>deafman1983</code></li>
+        <li>From your address: <code>${userAddress}</code></li>
+      </ol>
+      <p class="mb-0">Thank you for your support! ❤️</p>
+    </div>
+  `;
+}
+
+// Check if address is valid
+async function checkAddress(address, currency) {
+  try {
+    const response = await fetch(FAUCETPAY_API.checkAddress, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        api_key: API_KEY,
+        address: address,
+        currency: currency
+      })
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Address check failed:', error);
+    return { success: false, message: 'Check failed' };
+  }
+}
 </script>
