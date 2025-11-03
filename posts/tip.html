@@ -1,94 +1,80 @@
 <div class="card mb-4">
   <div class="card-header">
-    <h5 class="mb-0">Support DeafMan1983</h5>
+    <h5 class="mb-0">💝 Support DeafMan1983</h5>
   </div>
-  <div class="card-body">
+  <div class="card-body text-center">
     <p>If you find my Linux GTK4 development tutorials helpful, consider supporting my work!</p>
     
+    <!-- Simple fixed amount buttons -->
+    <div class="mb-4">
+      <label class="form-label">Quick Tip:</label>
+      <div class="btn-group w-100">
+        <button class="btn btn-outline-primary" onclick="sendTip(1)">$1</button>
+        <button class="btn btn-outline-primary" onclick="sendTip(5)">$5</button>
+        <button class="btn btn-outline-primary" onclick="sendTip(10)">$10</button>
+        <button class="btn btn-outline-primary" onclick="sendTip(20)">$20</button>
+      </div>
+    </div>
+    
+    <!-- Custom amount -->
     <div class="mb-3">
-      <label for="tipAmount" class="form-label">Tip Amount ($5 - $50):</label>
-      <input type="number" id="tipAmount" min="5" max="50" value="10" class="form-control mb-2">
-      <div class="form-text">Amount in USD</div>
+      <label for="customAmount" class="form-label">Custom Amount:</label>
+      <div class="input-group">
+        <input type="number" id="customAmount" min="0.1" max="100" step="0.1" value="5" class="form-control" placeholder="0.1-100">
+        <button class="btn btn-primary" onclick="sendCustomTip()">Send</button>
+      </div>
     </div>
     
-    <button class="btn btn-primary w-100 mb-2" onclick="testPayment()">
-      🔧 Test Payment Link
-    </button>
-    
-    <button class="btn btn-success w-100" onclick="goTip()">
-      💝 Support via FaucetPay
-    </button>
-    
-    <div class="mt-3 p-3 bg-dark rounded">
-      <small class="text-muted">
-        <strong>Payment Debug Info:</strong><br>
-        <div id="debugInfo" class="mt-2"></div>
-      </small>
+    <!-- Your FaucetPay address -->
+    <div class="alert alert-dark mt-3">
+      <strong>Send to my FaucetPay:</strong><br>
+      <code class="fs-5">perspecterscheerroot@faucetpay.io</code>
+      <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyAddress()">
+        📋 Copy
+      </button>
     </div>
+    
+    <p class="text-muted small mt-2">
+      <strong>How it works:</strong> Click any amount above, or copy my address and send directly from your FaucetPay account.
+    </p>
   </div>
 </div>
 
 <script>
-// Replace with your ACTUAL FaucetPay address
+// Your actual FaucetPay address
 const FAUCETPAY_ADDRESS = "jenspetereckervogt@gmail.com";
 
-function testPayment() {
-  const amount = document.getElementById('tipAmount').value;
-  const debugInfo = document.getElementById('debugInfo');
-  
-  // Validate amount
-  if (amount < 5 || amount > 50) {
-    debugInfo.innerHTML = `<span class="text-danger">❌ Invalid amount: $${amount}. Must be between $5-$50</span>`;
-    return;
-  }
-  
-  // Construct URL
-  const url = `https://faucetpay.io/merchant/send?to=${FAUCETPAY_ADDRESS}&currency=USD&amount=${amount}`;
-  
-  // Show debug information
-  debugInfo.innerHTML = `
-    <div class="text-info">
-      <strong>Generated Payment URL:</strong><br>
-      <small><code>${url}</code></small>
-    </div>
-    <div class="mt-2">
-      <button class="btn btn-sm btn-outline-warning" onclick="window.open('${url}', '_blank')">
-        🔗 Test Open This URL
-      </button>
-    </div>
-  `;
-  
-  console.log("Payment URL:", url);
-}
-
-function goTip() {
-  const amount = document.getElementById('tipAmount').value;
-  
-  // Validate amount
-  if (amount < 5 || amount > 50) {
-    alert('Please enter an amount between $5 and $50');
-    return;
-  }
-  
-  const url = `https://faucetpay.io/merchant/send?to=${FAUCETPAY_ADDRESS}&currency=USD&amount=${amount}`;
-  console.log("Redirecting to:", url);
-  
-  // Open in new tab
+// Send fixed amount
+function sendTip(amount) {
+  // Direct FaucetPay send URL
+  const url = `https://faucetpay.io/account/send?to=${FAUCETPAY_ADDRESS}&amount=${amount}&currency=USD`;
   window.open(url, '_blank');
+  console.log(`Sending $${amount} to ${FAUCETPAY_ADDRESS}`);
 }
 
-// Test if address is valid
-function validateFaucetPayAddress() {
-  if (!FAUCETPAY_ADDRESS || !FAUCETPAY_ADDRESS.includes('@faucetpay.io')) {
-    console.error("❌ Invalid FaucetPay address format");
-    return false;
+// Send custom amount
+function sendCustomTip() {
+  const amount = document.getElementById('customAmount').value;
+  if (!amount || amount < 0.1) {
+    alert('Please enter at least $0.10');
+    return;
   }
-  console.log("✅ FaucetPay address format looks valid");
-  return true;
+  sendTip(amount);
 }
 
-// Run validation on page load
-document.addEventListener('DOMContentLoaded', function() {
-  validateFaucetPayAddress();
-});
+// Copy address to clipboard
+function copyAddress() {
+  navigator.clipboard.writeText(FAUCETPAY_ADDRESS)
+    .then(() => alert('✅ FaucetPay address copied!'))
+    .catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = FAUCETPAY_ADDRESS;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('✅ Address copied!');
+    });
+}
 </script>
