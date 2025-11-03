@@ -1,18 +1,72 @@
 <div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">Support DeafMan1983</h5>
+  </div>
   <div class="card-body">
-    <h5>Support DeafMan1983</h5>
-    <p>You can tip any amount from $5 to $50 via FaucetPay:</p>
-    <input type="number" id="tipAmount" min="5" max="50" value="10" class="form-control mb-2">
-    <button class="btn btn-primary" onclick="goTip()">Tip Me</button>
+    <p>If you find my Linux GTK4 development tutorials helpful, consider supporting my work!</p>
+    
+    <div class="mb-3">
+      <label for="tipAmount" class="form-label">Tip Amount ($5 - $50):</label>
+      <input type="number" id="tipAmount" min="5" max="50" value="10" class="form-control mb-2">
+      <div class="form-text">Amount in USD</div>
+    </div>
+    
+    <button class="btn btn-primary w-100" onclick="goTip()">
+      <i class="bi bi-heart-fill"></i> Support via FaucetPay
+    </button>
+    
+    <div class="mt-3 p-3 bg-dark rounded">
+      <small class="text-muted">
+        <strong>My FaucetPay Address:</strong><br>
+        <code id="faucetpayAddress">deafman1983@faucetpay.io</code>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Alternative direct payment methods -->
+<div class="card">
+  <div class="card-body">
+    <h6>Other Support Methods:</h6>
+    <div class="d-grid gap-2">
+      <button class="btn btn-outline-secondary" onclick="copyAddress()">
+        Copy FaucetPay Address
+      </button>
+      <a href="https://faucetpay.io/?r=YOUR_REFERRAL_ID" class="btn btn-outline-info" target="_blank">
+        Sign up for FaucetPay
+      </a>
+    </div>
   </div>
 </div>
 
 <script>
+// Replace with your actual FaucetPay address
+const FAUCETPAY_ADDRESS = "jenspeterewckervogt@gmail.com";
+
 function goTip() {
   const amount = document.getElementById('tipAmount').value;
-  const to = "jenspetereckervogt@gmail.com";
-  const currency = "USD";
-  const url = `https://faucetpay.io/merchant/send?to=${to}&currency=${currency}&amount=${amount}`;
-  window.location.href = url;
+  
+  // Validate amount
+  if (amount < 5 || amount > 50) {
+    alert('Please enter an amount between $5 and $50');
+    return;
+  }
+  
+  // FaucetPay payment URL
+  const url = `https://faucetpay.io/merchant/send?to=${FAUCETPAY_ADDRESS}&currency=USD&amount=${amount}`;
+  window.open(url, '_blank');
 }
+
+function copyAddress() {
+  navigator.clipboard.writeText(FAUCETPAY_ADDRESS)
+    .then(() => {
+      alert('FaucetPay address copied to clipboard!');
+    })
+    .catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+}
+
+// Update the displayed address
+document.getElementById('faucetpayAddress').textContent = FAUCETPAY_ADDRESS;
 </script>
