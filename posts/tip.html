@@ -1,0 +1,18 @@
+<div class="card mb-4">
+  <div class="card-body">
+    <h5>Support DeafMan1983</h5>
+    <p>You can tip any amount from $5 to $50 via FaucetPay:</p>
+    <input type="number" id="tipAmount" min="5" max="50" value="10" class="form-control mb-2">
+    <button class="btn btn-primary" onclick="goTip()">Tip Me</button>
+  </div>
+</div>
+
+<script>
+function goTip() {
+  const amount = document.getElementById('tipAmount').value;
+  const to = "jenspetereckervogt@gmail.com";
+  const currency = "USD";
+  const url = `https://faucetpay.io/merchant/send?to=${to}&currency=${currency}&amount=${amount}`;
+  window.location.href = url;
+}
+</script>
