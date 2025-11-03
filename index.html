@@ -65,8 +65,18 @@
 
     async function loadPost() {
       const hash = location.hash.replace("#post/", "") || "hello-world";
-      const md = await loadMarkdown(`posts/${hash}.md`);
-      const html = marked.parse(md);
+      const post = posts.find(p => p.slug === hash);
+      if (!post) return;
+      
+      let html;
+      if (post.file.endsWith(".md")) {
+        const md = await loadMarkdown(`posts/${post.file}`);
+        html = marked.parse(md);
+      } else if (post.file.endsWith(".html")) {
+        const res = await fetch(`posts/${post.file}`);
+        html = await res.text();
+      }
+    
       document.getElementById("postContent").innerHTML = `
         <div class="card mb-4">
           <div class="card-body">
