@@ -1,5 +1,5 @@
 # Hello World
 
-Welcome my blog for Linux System - Development and compilation with Gtk4 as statically linked runtime. 
+Welcome to my blog for Linux System Development and compilation with **Gtk4** as statically linked runtime.
 
-Because we would like to create simple portable linux applications for without required installation of very latest version of Gtk4. 
+We want to create simple portable Linux applications that don’t require installation of the newest Gtk4 version.
