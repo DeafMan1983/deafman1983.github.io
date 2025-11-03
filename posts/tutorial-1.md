@@ -2,9 +2,9 @@
 
 Preparing with compilation of Gtk4 as statically linked 
 
-Hier lernst du, wie du deinen eigenen Blog mit **Bootstrap 5** und **Markdown** erstellen kannst.
+1. [Preparation](#post/preparation)
+   If you already created directory as custom directory like /opt/Gtk4Latest
 
-1. Lege `index.html`, `posts.json` und den Ordner `posts/` an.  
-2. Füge deine Beiträge als `.md`-Dateien ein.  
-3. Lade alles zu GitHub Pages hoch.  
-4. Fertig – dein Blog ist online!
+2. [Build Introduction](#post/build-introduction)
+   You need to download, compile and install to /opt/Gtk4Latest
+
