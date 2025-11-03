@@ -48,37 +48,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    // Beispiel-Posts (Markdown)
-    const posts = {
-      "hello-world": {
-        title: "Hello World",
-        date: "2025-11-03",
-        content: `
-# Hello World
-
-Willkommen zu meinem Blog. Hier schreibe ich Tutorials mit **Markdown** und style sie mit **Bootstrap 5**.
-
-## Warum so?
-- Einfach zu schreiben
-- Kein Build nötig (Client-Side SPA)
-- Du kannst Codeblöcke, Tabellen, Bilder etc. benutzen
-`
-      },
-      "tutorial-1": {
-        title: "Tutorial 1: Erste Schritte",
-        date: "2025-11-03",
-        content: `
-# Erste Schritte
-
-Dies ist dein erstes Tutorial.
-
-1. Lege neue Dateien an im Verzeichnis \`/posts\`
-2. Füge Markdown-Inhalte hinzu
-3. Verlinke sie in der Navigation
-`
-      }
-    };
-
     // Blog-Navigation generieren
     const postList = document.getElementById("postList");
     for (const [slug, post] of Object.entries(posts)) {
