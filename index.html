@@ -37,7 +37,10 @@
       <div class="col-md-4">
         <div class="card mb-4">
           <div class="card-header">Beiträge</div>
-          <div class="list-group list-group-flush" id="postList"></div>
+          <div class="list-group list-group-flush" id="postList">
+            <a href="#post/hello-world" class="list-group-item list-group-item-action bg-dark text-light">Hello World</a>
+            <a href="#post/tutorial-1" class="list-group-item list-group-item-action bg-dark text-light">Tutorial 1</a>
+          </div>
         </div>
       </div>
       <div class="col-md-8">
@@ -48,27 +51,25 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    // Blog-Navigation generieren
-    const postList = document.getElementById("postList");
-    for (const [slug, post] of Object.entries(posts)) {
-      const link = document.createElement("a");
-      link.href = "#post/" + slug;
-      link.className = "list-group-item list-group-item-action bg-dark text-light";
-      link.textContent = post.title;
-      postList.appendChild(link);
+    async function loadMarkdown(path) {
+      try {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error("Fehler beim Laden von " + path);
+        const text = await res.text();
+        return text;
+      } catch (err) {
+        return "# Fehler\nBeitrag konnte nicht geladen werden 😢";
+      }
     }
 
-    // Routing (Client-Seite)
-    function loadPost() {
-      const hash = location.hash.replace("#post/", "");
-      const post = posts[hash] || posts["hello-world"];
+    async function loadPost() {
+      const hash = location.hash.replace("#post/", "") || "hello-world";
+      const md = await loadMarkdown(`posts/${hash}.md`);
+      const html = marked.parse(md);
       document.getElementById("postContent").innerHTML = `
         <div class="card mb-4">
           <div class="card-body">
-            <h2>${post.title}</h2>
-            <small class="text-muted">Veröffentlicht: ${post.date}</small>
-            <hr>
-            <div>${marked.parse(post.content)}</div>
+            ${html}
           </div>
         </div>`;
     }
