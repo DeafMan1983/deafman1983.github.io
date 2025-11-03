@@ -43,16 +43,32 @@
 // Replace with your actual FaucetPay address
 const FAUCETPAY_ADDRESS = "jenspeterewckervogt@gmail.com";
 
+function trackTip(amount) {
+  // You can use Google Analytics, custom backend, or just console log
+  console.log(`Tip received: $${amount}`);
+  
+  // Example: Send to Google Analytics
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'tip', {
+      'event_category': 'support',
+      'event_label': 'faucetpay',
+      'value': amount
+    });
+  }
+}
+
+// Update the goTip function to include tracking
 function goTip() {
   const amount = document.getElementById('tipAmount').value;
   
-  // Validate amount
   if (amount < 5 || amount > 50) {
     alert('Please enter an amount between $5 and $50');
     return;
   }
   
-  // FaucetPay payment URL
+  // Track the tip attempt
+  trackTip(amount);
+  
   const url = `https://faucetpay.io/merchant/send?to=${FAUCETPAY_ADDRESS}&currency=USD&amount=${amount}`;
   window.open(url, '_blank');
 }
