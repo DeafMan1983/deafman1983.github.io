@@ -1,106 +1,64 @@
 <div class="card mb-4">
-  <div class="card-header">
-    <h5 class="mb-0">💝 Support DeafMan1983</h5>
-  </div>
   <div class="card-body text-center">
-    <p>If you find my Linux GTK4 development tutorials helpful, consider supporting my work!</p>
+    <h5>💝 Support DeafMan1983</h5>
+    <p>Support my GTK4 Linux development tutorials</p>
     
-    <!-- Fixed amount buttons -->
+    <!-- Simple amount selection -->
     <div class="mb-4">
-      <label class="form-label">Quick Tip (USD):</label>
-      <div class="btn-group w-100 flex-wrap">
-        <button class="btn btn-outline-primary mb-1" onclick="sendPayment(1)">$1</button>
-        <button class="btn btn-outline-primary mb-1" onclick="sendPayment(5)">$5</button>
-        <button class="btn btn-outline-primary mb-1" onclick="sendPayment(10)">$10</button>
-        <button class="btn btn-outline-primary mb-1" onclick="sendPayment(20)">$20</button>
-        <button class="btn btn-outline-primary mb-1" onclick="sendPayment(50)">$50</button>
+      <label class="form-label">Select Tip Amount:</label>
+      <div class="row g-2">
+        <div class="col-6">
+          <button class="btn btn-outline-primary w-100" onclick="preparePayment(1)">$1</button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-outline-primary w-100" onclick="preparePayment(5)">$5</button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-outline-primary w-100" onclick="preparePayment(10)">$10</button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-outline-primary w-100" onclick="preparePayment(20)">$20</button>
+        </div>
       </div>
     </div>
     
-    <!-- Custom amount -->
-    <div class="mb-4">
-      <label for="customAmount" class="form-label">Custom Amount (USD):</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" id="customAmount" min="1" max="100" value="10" class="form-control" placeholder="Enter amount">
-        <button class="btn btn-primary" onclick="sendCustomPayment()">Send</button>
-      </div>
-    </div>
-    
-    <!-- Your FaucetPay address -->
-    <div class="alert alert-dark mt-3">
-      <strong>My FaucetPay Username:</strong><br>
-      <code class="fs-5">deafman1983</code>
-      <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyUsername()">
-        📋 Copy
+    <!-- Payment information -->
+    <div class="alert alert-dark">
+      <h6>Send Payment via FaucetPay:</h6>
+      <p class="mb-1"><strong>Username:</strong> <code>deafman1983</code></p>
+      <p class="mb-1"><strong>Amount:</strong> <span id="selectedAmount">$10</span></p>
+      <button class="btn btn-success w-100 mt-2" onclick="goToFaucetPay()">
+        🚀 Go to FaucetPay to Complete Payment
       </button>
     </div>
     
-    <!-- Direct transfer link -->
-    <a href="https://faucetpay.io/account/transfer" class="btn btn-success w-100 mb-2" target="_blank">
-      🔗 Go to FaucetPay Transfer
-    </a>
-    
-    <div class="text-start small text-muted mt-3">
-      <strong>How it works:</strong>
-      <ol class="mt-2">
-        <li>Click any amount button above</li>
-        <li>You'll be taken to FaucetPay transfer page</li>
-        <li>Your username and amount will be pre-filled</li>
-        <li>Select currency and complete transfer</li>
-      </ol>
-    </div>
+    <p class="small text-muted">
+      You'll need a FaucetPay account with balance to send tips.
+    </p>
   </div>
 </div>
 
 <script>
-// Your FaucetPay username (without @faucetpay.io)
-const FAUCETPAY_USERNAME = "deafman1983";
+let currentAmount = 10;
 
-// Send payment with specific amount
-function sendPayment(amount) {
-  // FaucetPay transfer URL with parameters
-  const url = `https://faucetpay.io/account/transfer?username=${FAUCETPAY_USERNAME}&amount=${amount}&currency=USD`;
+function preparePayment(amount) {
+  currentAmount = amount;
+  document.getElementById('selectedAmount').textContent = '$' + amount;
   
-  console.log(`Opening FaucetPay transfer: $${amount} to ${FAUCETPAY_USERNAME}`);
-  window.open(url, '_blank');
+  // Show confirmation
+  alert(`Ready to send $${amount} to deafman1983\n\nClick the "Go to FaucetPay" button to complete payment.`);
 }
 
-// Send custom amount
-function sendCustomPayment() {
-  const amountInput = document.getElementById('customAmount');
-  const amount = parseFloat(amountInput.value);
+function goToFaucetPay() {
+  // Redirect to FaucetPay send money page
+  window.open('https://faucetpay.io/page/send-money', '_blank');
   
-  if (!amount || amount < 1 || amount > 100) {
-    alert('Please enter a valid amount between $1 and $100');
-    amountInput.focus();
-    return;
-  }
-  
-  sendPayment(amount);
+  // Show final instructions
+  setTimeout(() => {
+    alert(`Payment Instructions:\n\n1. Login to FaucetPay\n2. Go to "Send Money"\n3. Recipient: deafman1983\n4. Amount: $${currentAmount}\n5. Complete payment`);
+  }, 1000);
 }
 
-// Copy username to clipboard
-function copyUsername() {
-  navigator.clipboard.writeText(FAUCETPAY_USERNAME)
-    .then(() => alert('Username copied: ' + FAUCETPAY_USERNAME))
-    .catch(() => {
-      // Fallback
-      const textArea = document.createElement('textarea');
-      textArea.value = FAUCETPAY_USERNAME;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      alert('Username copied: ' + FAUCETPAY_USERNAME);
-    });
-}
-
-// Quick enter for custom amount
-document.getElementById('customAmount').addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    sendCustomPayment();
-  }
-});
-</script>
+// Set default amount
+preparePayment(10);
 </script>
