@@ -1,0 +1,61 @@
+<script>
+const GH_API_URL = 'https://api.github.com/repos/deafman1983/deafman1983.github.io/issues/7/comments?per_page=100';
+
+let request = new XMLHttpRequest();
+request.open('GET', GH_API_URL, true);
+request.onload = function() {
+	if (this.status >= 200 && this.status < 400) {
+		let response = JSON.parse(this.response);
+		for (var i = 0; i < response.length; i++) {
+			document.getElementById('gh-comments-list').appendChild(createCommentEl(response[i]));
+		}
+		if (response.length === 0) {
+			document.getElementById('no-comments-found').style.display = 'block';
+		}
+	} else {
+		console.error(this);
+	}
+};
+
+function createCommentEl(response) {
+	let user = document.createElement('a');
+	user.href = response.user.html_url;
+	user.classList.add('user');
+
+	let avatar = document.createElement('img');
+	avatar.src = response.user.avatar_url;
+	avatar.classList.add('avatar');
+	user.appendChild(avatar);
+
+	let commentLink = document.createElement('a');
+	commentLink.href = response.html_url;
+	commentLink.classList.add('comment-url');
+	commentLink.innerText = `#${response.id} – ${new Date(response.created_at).toLocaleString()}`;
+
+	let body = document.createElement('div');
+	body.classList.add('comment-content');
+	body.innerHTML = marked.parse(response.body); // optional: use Markdown parser if you want
+
+	let li = document.createElement('li');
+	li.appendChild(user);
+	li.appendChild(body);
+	li.appendChild(commentLink);
+	return li;
+}
+request.send();
+</script>
+
+<hr>
+
+<div class="github-comments">
+	<h2>Comments</h2>
+	<ul id="gh-comments-list"></ul>
+	<p id="no-comments-found" style="display:none;">No comments found for this article.</p>
+	<p id="leave-a-comment">
+		💬 Join the discussion for this article on
+		<a href="https://github.com/deafman1983/deafman1983.github.io/issues/7" target="_blank">
+			this GitHub Issue
+		</a>.
+		Comments appear here automatically!
+	</p>
+</div>
